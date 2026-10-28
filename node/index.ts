@@ -16,18 +16,18 @@ app.use((req,res,next)=>{
 
 function jwt1 (req:Request,res:Response,next:NextFunction){
     try{
-    if(!req.headers.authorization)return next();
+    console.log("jwt1 start");
+    if(!req.headers.authorization){
+        console.log("没有token");
+        return res.json({success:false,message:"缺少必要验证"});}
     const token = req.headers.authorization.split(" ")[1];
-
-    const jwttrue = jwt.verify(token,select);
-    
-    res.status(200).json({
-        success:true,
-        data:jwttrue
-    })
+    console.log("开始verify");
+    jwt.verify(token,select);
+    console.log("准备继续")
+    return next()
     }catch(e){
         console.log(e);
-        return next();
+        return res.json({message:e,success:false});
     }
 
 }
@@ -57,7 +57,7 @@ app.post('/register',async (req,res)=>{
     });
     }
     catch(e){
-        res.status(404).json({
+        res.json({
             success:false,
             message:`${e}`
         })
@@ -87,7 +87,7 @@ try{
 
     if(!pwverify){
         return(
-            res.status(404).json({
+            res.json({
             success:false,
             message:"账号密码错误,请重试"
         })
@@ -102,11 +102,30 @@ try{
     })
     
 }catch(e){
-    res.status(403).json({
+    res.json({
         success:false,
         message:"未知错误"
     })
 }
+})
+
+app.post("/Submit",jwt1,async (req,res)=>{
+    try{
+    const{statusID,statusMount} = req.body;
+
+    const connection = await mysql.createConnection({
+        host:"127.0.0.1",
+        database:"system",
+        user:"li",
+        password:"1126"
+    })
+
+    const [submit] = await connection.execute("INSERT INTO request (requestid, device) VALUES(?,?)",[statusID,statusMount]);
+
+    res.status(200).json({success:true,message:submit});
+    }catch(e){
+        res.json({success:false,message:e});
+    }
 })
 
 

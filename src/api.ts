@@ -16,15 +16,14 @@ api.interceptors.request.use((config)=>{
 
 api.interceptors.response.use(
     (response)=>{
+        console.log("interceptor response");
+        console.log(response);
         return response;
     }
     ,
     (error)=>{
-        if(error == "404"){
-            console.log("密码错误");
-        }else if(error == "403"){
-            console.log("服务器未知错误");
-        }
+        console.log("interceptor error");
+        console.log(error);
         return Promise.reject(error);
     }
 )

@@ -5,7 +5,7 @@ import './admin.css';
 
 export default function Admin(){
     const navigate = useNavigate();
-    const {user,id} = useContext(Context);
+    const { user, id } = useContext(Context);
     return(
      <div>
         <div className = "admin_nav">

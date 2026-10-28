@@ -5,36 +5,56 @@ import {Routes,Route,Navigate} from 'react-router-dom';
 import Admin from './admin.tsx';
 import User from './user.tsx';
 import {Context} from './context.tsx';
+type Props = {
+  children:React.ReactNode;
+}
 
 
 function App() {
-  const role = localStorage.getItem("role");
-  let user = "";
-  let id = "";
-  if(role){
-    [user,id] = role.split(" ");
-  }
+  const [username,setusername] = useState("");
+  const [id,setid] = useState("");
+
   return (
+
     <div className = "web w-[100vw] h-[100vh]">
 
-     <Context.Provider value = {{user:user,id:id}}>
+     <Context.Provider value={{user:username,id:id,setId:setid,setUser:setusername}}>
       <Routes>
         <Route path="/" element={<Check />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/admin/:id" element={<Admin />} />
-        <Route path="/user/:id" element={<User />} />
+        <Route path="/admin/:id" element={
+          <CheckLogin>
+            <Admin />
+          </CheckLogin>
+        } />
+        <Route path="/user/:id" element={
+          <CheckLogin>
+            <User />
+          </CheckLogin>
+        } />
       </Routes>
      </Context.Provider>
     </div>
   )
 }
 
+function CheckLogin ({children}:Props) {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+
+    if (!token || !role) {
+        return <Navigate to="/login" replace />;
+    }
+
+    return <>{children}</>;
+}
+
 function Check(){
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
   if(!token || !role)return (<Navigate to="/login" replace />);
-    const [user,id] = role.split(" ");
-  return (<Navigate to={`/${user}/${id}`} replace />);
+  const[_,id] = role.split(" ");
+  return (<Navigate to={`/user/${id}`} replace />)
 }
 
 export default App
