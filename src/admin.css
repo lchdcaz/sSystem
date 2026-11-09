@@ -1,4 +1,20 @@
-.admin_nav{
-    display:flex;
-    justify-content:space-around;
+
+.history{
+    scrollbar-width:none;
+    -ms-overflow-style:none;
 }
+
+.exit{
+    z-index:10;
+}
+
+/* .bo{
+    transition:all 1s ease;
+    background-color:white;
+    z-index:1;
+} */
+
+/* .exit:hover + .bo{
+    transform:rotate(0.3turn);
+    background-color:rgba(128, 128, 128, 0.678);
+} */

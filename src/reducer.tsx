@@ -6,18 +6,41 @@ type device = {
 }
 
 
+
 type actions = 
     |{type:"change";status:boolean;}
     |{type:"pic";pic:device}
     |{type:"mount",mount:number}
     |{type:"add"}
     |{type:"cut"}
+    |{type:"apply",data:data[]}
 
 type state = {
     status:boolean;
     pic:device;
     mount:number;
+    apply:data[];
 }
+
+type data = {
+    id:number,
+    device:string,
+    requestid:number,
+    user_id:string,
+    status:number
+}
+
+type adminstate = Pick<state,"status"> & {
+    data:data[];
+    select:number;
+}
+
+type adminActions = 
+    |{type:"change",value:boolean}
+    |{type:"data",value:data[]}
+    |{type:"select",value:number}
+    |{type:"datachange",value:string}
+
 
 function Reducer(state:{"username":string;"password":string},actions:{type:"username" | "password";value:string}){
 
@@ -29,6 +52,10 @@ function Reducer(state:{"username":string;"password":string},actions:{type:"user
 
         case("password"):{
             return {...state,"password":actions.value};
+        }
+        default:{
+            alert("报错，请重试");
+            return state;
         }
     }
 }
@@ -54,7 +81,41 @@ function UserReducer(state:state,actions:actions){
             if(state.mount == 0 )return {...state,mount:state.mount};
             return {...state,mount:state.mount - 1};
         }
+        case("apply"):{
+            return {...state,apply:actions.data}
+        }
+        default:{
+            alert("报错，请重试");
+            return state;
+        }
     }
 }
 
-export {Reducer,UserReducer}
+function AdminReducer(state:adminstate,actions:adminActions){
+    switch(actions.type){
+
+        case("change"):{
+            return {...state,status:actions.value};
+        }
+
+        case("data"):{
+            return {...state,data:actions.value};
+        }
+
+        case("select"):{
+            return {...state,select:actions.value}
+        }
+        
+        case("datachange"):{
+            return {...state,data:state.data.map((items)=>{
+                return (items.id === state.select)?{...items,status:(actions.value == "agree"?1:2)}:items
+                })}
+            }
+        default:{
+            alert("报错，请重试");
+            return state;
+        }
+        }
+}
+
+export {Reducer,UserReducer,AdminReducer}

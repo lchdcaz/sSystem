@@ -11,6 +11,7 @@ app.use(cors());
 app.use(express.json());
 app.use((req,res,next)=>{
     console.log(req.body);
+    console.log(req.query);
     next();
 })
 
@@ -52,12 +53,12 @@ app.post('/register',async (req,res)=>{
 
     console.log("这个是id",id);
 
-    res.status(200).json({
+    return res.status(200).json({
         success:true
     });
     }
     catch(e){
-        res.json({
+        return res.json({
             success:false,
             message:`${e}`
         })
@@ -79,7 +80,7 @@ try{
 
     const [id] = await connection.execute<RowDataPacket[]>("SELECT id FROM users WHERE username = ?",[username]);
 
-
+    console.log(1);
     console.log(search[0].password);
 
     const pwverify = await bcrypt.compare(password,search[0].password);
@@ -95,14 +96,14 @@ try{
     }
     const jwttrue = jwt.sign({id:id[0].id,user:username},select,{expiresIn:'1h'});
 
-    res.status(200).json({
+    return res.status(200).json({
         success:true,
         data:{jwt:jwttrue,id:id[0].id},
         message:"ok"
     })
     
 }catch(e){
-    res.json({
+    return res.json({
         success:false,
         message:"未知错误"
     })
@@ -111,7 +112,7 @@ try{
 
 app.post("/Submit",jwt1,async (req,res)=>{
     try{
-    const{statusID,statusMount} = req.body;
+    const{statusID,statusMount,userID} = req.body;
 
     const connection = await mysql.createConnection({
         host:"127.0.0.1",
@@ -120,11 +121,93 @@ app.post("/Submit",jwt1,async (req,res)=>{
         password:"1126"
     })
 
-    const [submit] = await connection.execute("INSERT INTO request (requestid, device) VALUES(?,?)",[statusID,statusMount]);
+    const [submit] = await connection.execute("INSERT INTO request (requestid, device, user_id) VALUES(?,?,?)",[statusID,statusMount,userID]);
 
-    res.status(200).json({success:true,message:submit});
+   return res.status(200).json({success:true,message:submit});
     }catch(e){
-        res.json({success:false,message:e});
+        return res.json({success:false,message:e});
+    }
+})
+
+app.get("/Inquiry",jwt1,async (req,res)=>{
+    try{
+        console.log('请求数据库连接.......');
+        const connection = await mysql.createConnection({
+            host:'127.0.0.1',
+            database:'system',
+            user:'li',
+            password:'1126'
+        })
+        console.log('连接成功，正在调取数据.....');
+        const [request] = await connection.execute("SELECT * FROM request");
+        console.log('调取成功，准备返回中.....')
+        return res.status(200).json({
+            success:true,
+            data:request
+        })
+    }catch(e){
+        return res.status(200).json({
+            success:false,
+            message:e
+        })
+    }
+})
+
+app.post("/admin/:status",jwt1,async (req,res)=>{
+    try{
+        const {status} = req.params;
+        const {id} = req.body;
+        console.log(status);
+        const connection = await mysql.createConnection({
+            host:"127.0.0.1",
+            database:"system",
+            user:"li",
+            password:"1126"
+        })
+
+        console.log("数据库连接成功....");
+
+        let statusid:number;
+
+        if(status === "agree")statusid = 1;
+        else if(status === "reject")statusid = 2;
+        else statusid = 3;
+            const [done] = await connection.execute("UPDATE request SET status = ? WHERE id = ?",[statusid,id]);
+
+            return res.json({
+                success:true,
+                message:done
+            })
+
+    }catch(e){
+        return res.json({
+            success:false,
+            message:e
+        })
+    }
+})
+
+app.get("/got",jwt1,async (req,res)=>{
+    try{
+        console.log("start access")
+        const {userid} = req.query;
+        const connection = await mysql.createConnection({
+            host:"127.0.0.1",
+            database:"system",
+            user:"li",
+            password:"1126"
+        })
+        
+        const [data] = await connection.execute("SELECT * FROM request WHERE user_id = ?",[Number(userid)]);
+
+        console.log(data);
+
+        res.status(200).json({
+            success:true,
+            data:data
+        })
+    }catch(e){
+        console.log(e);
     }
 })
 

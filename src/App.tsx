@@ -1,4 +1,4 @@
-import { useState,useEffect } from 'react';
+import { useState,useEffect,useContext } from 'react';
 import './App.css';
 import Login from './login.tsx';
 import {Routes,Route,Navigate} from 'react-router-dom';
@@ -13,6 +13,14 @@ type Props = {
 function App() {
   const [username,setusername] = useState("");
   const [id,setid] = useState("");
+  const role = localStorage.getItem("role");
+
+  useEffect(()=>{
+    if(role){
+      setusername(role.split(" ")[0]);
+      setid(role.split(" ")[1]);
+    }
+  },[])
 
   return (
 
@@ -53,7 +61,8 @@ function Check(){
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
   if(!token || !role)return (<Navigate to="/login" replace />);
-  const[_,id] = role.split(" ");
+  const[user,id] = role.split(" ");
+  if(user == "admin")return(<Navigate to={`/admin/${id}`} replace/>);
   return (<Navigate to={`/user/${id}`} replace />)
 }
 

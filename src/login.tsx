@@ -32,13 +32,13 @@ export default function Login(){
         if(state.username == "admin"){
             setUser(state.username);
             setId(response.data.data.id.toString());
-            navigate(`/admin/${response.data.data.id}`);
+            navigate(`/admin/${response.data.data.id}`,{replace:true});
             console.log(response.data.data.id);
             return;
         }
         setUser(state.username);
         setId(response.data.data.id.toString());
-        navigate(`/user/${response.data.data.id}`);
+        navigate(`/user/${response.data.data.id}`,{replace:true});
     }
     return(
      <div className = "login h-[100%] w-[100%] relative flex justify-center items-center">

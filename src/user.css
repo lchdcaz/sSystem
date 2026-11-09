@@ -2,14 +2,8 @@
     height:100vh;
     width:100vw;
 }
-.context{
-    display:flex;
-}
-.img{
-    flex:1;
-    display:flex;
-    flex-wrap:wrap;
-}
-.dev{
-    flex:1;
+
+.history{
+    scrollbar-width:none;
+    -ms-overflow-style:none;
 }
