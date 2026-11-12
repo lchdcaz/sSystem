@@ -14,12 +14,19 @@ type actions =
     |{type:"add"}
     |{type:"cut"}
     |{type:"apply",data:data[]}
+    |{type:"new",data:data}
+    |{type:"context",value:number}
+    |{type:"nav",value:boolean}
+    |{type:"nav1",value:boolean}
 
 type state = {
     status:boolean;
     pic:device;
     mount:number;
     apply:data[];
+    context:number;
+    nav:boolean;
+    nav1:boolean;
 }
 
 type data = {
@@ -29,6 +36,7 @@ type data = {
     user_id:string,
     status:number
 }
+
 
 type adminstate = Pick<state,"status"> & {
     data:data[];
@@ -83,6 +91,19 @@ function UserReducer(state:state,actions:actions){
         }
         case("apply"):{
             return {...state,apply:actions.data}
+        }
+        case("new"):{
+            return {...state,apply:[...state.apply,actions.data]}
+        }
+        case("context"):{      
+            console.log(state.context,actions.value)
+            return {...state,context:(state.context == actions.value)?0:actions.value}
+        }
+        case("nav"):{
+            return {...state,nav:(actions.value) ? false : true}
+        }
+        case("nav1"):{
+            return {...state,nav1:(actions.value) ? false : true}
         }
         default:{
             alert("报错，请重试");

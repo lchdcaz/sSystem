@@ -40,7 +40,7 @@ export default function Admin(){
         Inquiry();
     },[])
     return(
-     <div className = "w-[100vw] h-[100vh] flex flex-col">
+     <div className = "w-[100vw] h-[100vh] flex flex-col max-w-[2800px] max-w-[926px] mx-auto">
         <div className = "admin_nav flex-1 flex p-5 bg-gray-800/50">
             <div className = "flex self-center pl-10">
                 <div>
@@ -57,12 +57,33 @@ export default function Admin(){
             </div>
             <div></div>
         </div>
-        <div className = "flex-7 flex gap-5 pt-5 justify-end">
-            <div className = "border-r-2"><h2 className = "px-8">申请项目</h2></div>
-            <div className = {`w-[90vw] h-[500px]  shadow-[0_10px_10px_-5px_black] pt-5 rounded-[15px_3%] ml-3 pl-3 transition-all duration-300 ease-linear ${status.status ? "justify-items-end h-[700px]" : "w-[90vw] origin-right"}`}>
-                <div className = {`flex flex-wrap overflow-y-auto history gap-5 h-[100%] transtion-all duration-300 ease-linear ${status.status ? "w-[61%] content-start" : "w-[100%]"}`}>
+        <div className = " relative flex-7 flex max-[960px]:flex-col gap-5 pt-5 justify-center">
+            <div className = "max-[960px]:hidden"><h2 className = "">申请项目</h2></div>
+                <div className = {`absolute z-50 inset-0 bg-white top-3 w-[38%] max-[960px]:w-[100%] h-[91%] max-h-[708px]  flex flex-col transition-all duration-300 ease-linear origin-left rounded-2xl shadow-[0_10px_10px_-5px_black] perspective-[800px] ${status.status ? "scale-x-[1] max-[960px]:static opacity-100" : "scale-x-[0] opacity-0"}`}>
+                    <button className = "absolute right-2 w-auto h-auto hover:[transform:translateZ(2px)]" onClick = {()=>dispatch({type:"change",value:false})}>关闭</button>
+                    {(findId) && (
+                        <>
+                            <div className = "self-center border rounded-3xl shadow-[4px_5px_2px_2px_rgba(0,0,0,0.9),4px_5px_2px_15px_rgba(255,255,255,0.8)] mt-20">
+                            <img src={img[findId.requestid]} className = "flex-1 w-[300px] h-[300px]"/>
+                            </div>
+                            <div className = "flex-1 justify-center items-center flex flex-col max-[960px]:mt-10">
+                            <h1>设备编号:{findId.requestid}</h1>
+                            <p>设备数量:{findId.device}</p>
+                            <p>申请用户Id:{findId.user_id}</p>
+                            <p>状态:{(findId.status == 0)?"待确认":(findId.status == 1)?"已确认":"以驳回"}</p>
+                            <div className = "mt-20 max-[960px]:mt-5 max-[960px]:mb-2 border w-[150px] h-[50px] justify-center flex rounded-2xl perspective-[800px]">
+                            <button className = "mr-2 hover:[transform:translateZ(10px)] hover:translate-x-[5px]" onClick = {()=>Submit("agree")}>同意</button>
+                            <button className = "ml-2 hover:[transform:translateZ(10px)] hover:translate-x-[5px]"onClick = {()=>Submit("reject")}>驳回</button>
+                            </div>
+                            </div>
+                        </>
+                    )}
+                </div>
+            <div className = {`relative w-[88%] h-[100%] pl-5 max-[960px]:pl-0 transition-all duration-100 ease-linear justify-end flex max-[957px]:w-[100%]`}>
+                <div className = {` w-[1px] transtion-all duration-300 ease-linear shadow-[0_0_10px_3px_black,0_0_10px_6px_rgba(0,0,0,0.3),0_0_10px_7px_white] ${status.status ? " h-[92%]" : " h-[100%]"} max-[957px]:hidden`}></div>
+                <div className = {`flex ml-4 max-[960px]:ml-0 flex-wrap overflow-y-auto history gap-5 h-[500px] transition-all duration-300 ease-linear pl-2 pt-2 shadow-[0_10px_10px_-5px_black] perspective-[800px] rounded-[15px_2%] max-[960px]:justify-center ${status.status ? "w-[65%] max-[960px]:w-[100%] content-start shadow-[0_10px_10px_-5px_black]  h-[700px]" : "w-[100%]"}`}>
                 {status.data.map(({status:status1,device:mount,user_id,requestid:deviceId,id},index)=>(
-                    <div key={index} className = {`bg-gray-500  p-5 rounded-[15px] text-white transtion-all duration-300 ease-linear ${status.status ? "w-[10vw] h-[15vh]" : "w-[15vw] h-[20vh]"}`} onClick={()=>{
+                    <div key={index} className = {`bg-gray-500  p-5 rounded-[15px] text-white transtion-all duration-300 ease-linear hover:[transform:translateZ(5px)] min-w-[125px] min-h-[14vh] ${(status1 == 0) ? "inset-shadow-[0_0_15px_2px_var(--color-yellow-700)]" : (status1 == 1) ? "inset-shadow-[0_0_10px_2px_var(--color-green-700)]" : "inset-shadow-[0_0_10px_2px_var(--color-red-900)]"} ${status.status ? "w-[100px] h-[140px]" : "w-[100px] h-[140px] "}`} onClick={()=>{
                         dispatch({type:"change",value:true});
                         dispatch({type:"select",value:id});
                     }}>
@@ -75,26 +96,6 @@ export default function Admin(){
                 </div>
             </div>
         </div>
-                <div className = {`absolute bg-white w-[40vw] h-[767px] top-40 flex card scale-x-[0] transition-all duration-300 ease-linear origin-left ${status.status ? "scale-x-[1]" : ""}`}>
-
-                    {(findId) && (
-                        <>
-                            <img src={img[findId.requestid]} width="400" height = "200" className = "flex-1"/>
-                            <div className = "flex-1 ml-10 justify-center items-center flex flex-col">
-                            <button className = "absolute top-2 right-2" onClick = {()=>dispatch({type:"change",value:false})}>关闭</button>
-                            <h1>设备编号:{findId.requestid}</h1>
-                            <p>设备数量:{findId.device}</p>
-                            <p>申请用户Id:{findId.user_id}</p>
-                            <p>状态:{(findId.status == 0)?"待确认":(findId.status == 1)?"已确认":"以驳回"}</p>
-                            <div className = "mt-20 gap-10 flex border p-3">
-                            <button className = "" onClick = {()=>Submit("agree")}>同意</button>
-                            <p>|</p>
-                            <button onClick = {()=>Submit("reject")}>驳回</button>
-                            </div>
-                            </div>
-                        </>
-                    )}
-                </div>
         
      </div>
     )

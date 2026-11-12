@@ -1,7 +1,7 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
-import mysql from 'mysql2/promise';
+import pool from './pool/db.ts';
 import bcrypt from 'bcrypt';
 import type { Request, Response, NextFunction } from "express";
 import type {RowDataPacket} from "mysql2";
@@ -36,20 +36,14 @@ function jwt1 (req:Request,res:Response,next:NextFunction){
 app.post('/register',async (req,res)=>{
     try{
     const {username,password} = req.body;
-    const connection = await mysql.createConnection({
-        host:"127.0.0.1",
-        database:"system",
-        user:"li",
-        password:"1126"
-    })
 
     const bcryptPassword = await bcrypt.hash(password,10);
 
-    const [write] = await connection.execute("INSERT INTO users (username,password) VALUES(?,?)",[username,bcryptPassword]);
+    const [write] = await pool.execute("INSERT INTO users (username,password) VALUES(?,?)",[username,bcryptPassword]);
 
     console.log("这个是",write);
 
-    const [id] = await connection.execute("SELECT id FROM users WHERE username = ?",[username]);
+    const [id] = await pool.execute("SELECT id FROM users WHERE username = ?",[username]);
 
     console.log("这个是id",id);
 
@@ -69,16 +63,10 @@ app.post('/register',async (req,res)=>{
 app.post('/login',async (req,res)=>{
 try{
     const {username,password} = req.body;
-    const connection = await mysql.createConnection({
-        host:"127.0.0.1",
-        database:"system",
-        user:"li",
-        password:"1126"
-    })
 
-    const [search] = await connection.execute<RowDataPacket[]>("SELECT password FROM users WHERE username = ?",[username]);
+    const [search] = await pool.execute<RowDataPacket[]>("SELECT password FROM users WHERE username = ?",[username]);
 
-    const [id] = await connection.execute<RowDataPacket[]>("SELECT id FROM users WHERE username = ?",[username]);
+    const [id] = await pool.execute<RowDataPacket[]>("SELECT id FROM users WHERE username = ?",[username]);
 
     console.log(1);
     console.log(search[0].password);
@@ -114,14 +102,7 @@ app.post("/Submit",jwt1,async (req,res)=>{
     try{
     const{statusID,statusMount,userID} = req.body;
 
-    const connection = await mysql.createConnection({
-        host:"127.0.0.1",
-        database:"system",
-        user:"li",
-        password:"1126"
-    })
-
-    const [submit] = await connection.execute("INSERT INTO request (requestid, device, user_id) VALUES(?,?,?)",[statusID,statusMount,userID]);
+    const [submit] = await pool.execute("INSERT INTO request (requestid, device, user_id) VALUES(?,?,?)",[statusID,statusMount,userID]);
 
    return res.status(200).json({success:true,message:submit});
     }catch(e){
@@ -132,15 +113,10 @@ app.post("/Submit",jwt1,async (req,res)=>{
 app.get("/Inquiry",jwt1,async (req,res)=>{
     try{
         console.log('请求数据库连接.......');
-        const connection = await mysql.createConnection({
-            host:'127.0.0.1',
-            database:'system',
-            user:'li',
-            password:'1126'
-        })
         console.log('连接成功，正在调取数据.....');
-        const [request] = await connection.execute("SELECT * FROM request");
-        console.log('调取成功，准备返回中.....')
+        const [request] = await pool.execute("SELECT * FROM request");
+        console.log('调取成功，准备返回中.....');
+
         return res.status(200).json({
             success:true,
             data:request
@@ -158,12 +134,6 @@ app.post("/admin/:status",jwt1,async (req,res)=>{
         const {status} = req.params;
         const {id} = req.body;
         console.log(status);
-        const connection = await mysql.createConnection({
-            host:"127.0.0.1",
-            database:"system",
-            user:"li",
-            password:"1126"
-        })
 
         console.log("数据库连接成功....");
 
@@ -172,7 +142,8 @@ app.post("/admin/:status",jwt1,async (req,res)=>{
         if(status === "agree")statusid = 1;
         else if(status === "reject")statusid = 2;
         else statusid = 3;
-            const [done] = await connection.execute("UPDATE request SET status = ? WHERE id = ?",[statusid,id]);
+            const [done] = await pool.execute("UPDATE request SET status = ? WHERE id = ?",[statusid,id]);
+
 
             return res.json({
                 success:true,
@@ -191,14 +162,8 @@ app.get("/got",jwt1,async (req,res)=>{
     try{
         console.log("start access")
         const {userid} = req.query;
-        const connection = await mysql.createConnection({
-            host:"127.0.0.1",
-            database:"system",
-            user:"li",
-            password:"1126"
-        })
         
-        const [data] = await connection.execute("SELECT * FROM request WHERE user_id = ?",[Number(userid)]);
+        const [data] = await pool.execute("SELECT * FROM request WHERE user_id = ?",[Number(userid)]);
 
         console.log(data);
 
