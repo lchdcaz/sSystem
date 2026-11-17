@@ -1,4 +1,4 @@
-import { useState,useEffect,useContext } from 'react';
+import { useState,useEffect } from 'react';
 import './App.css';
 import Login from './login.tsx';
 import {Routes,Route,Navigate} from 'react-router-dom';
@@ -14,6 +14,7 @@ function App() {
   const [username,setusername] = useState("");
   const [id,setid] = useState("");
   const role = localStorage.getItem("role");
+  console.log("text1");
 
   useEffect(()=>{
     if(role){
@@ -67,3 +68,4 @@ function Check(){
 }
 
 export default App
+

@@ -1,12 +1,16 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
-import pool from './pool/db.ts';
+import pool from './pool/db.js';
 import bcrypt from 'bcrypt';
 import type { Request, Response, NextFunction } from "express";
 import type {RowDataPacket} from "mysql2";
+import dotenv from 'dotenv';
+dotenv.config();
+const {JWT_secret,PORT} = process.env;
+if(!JWT_secret || !PORT)throw new Error ("配置错误");
 const app = express();
-const select = "mycodeBest"
+const select = JWT_secret;
 app.use(cors());
 app.use(express.json());
 app.use((req,res,next)=>{
@@ -23,6 +27,7 @@ function jwt1 (req:Request,res:Response,next:NextFunction){
         return res.json({success:false,message:"缺少必要验证"});}
     const token = req.headers.authorization.split(" ")[1];
     console.log("开始verify");
+    if(!token)return res.json({success:false,message:"localstroage is undefined"})
     jwt.verify(token,select);
     console.log("准备继续")
     return next()
@@ -33,7 +38,7 @@ function jwt1 (req:Request,res:Response,next:NextFunction){
 
 }
 
-app.post('/register',async (req,res)=>{
+app.post('/api/register',async (req,res)=>{
     try{
     const {username,password} = req.body;
 
@@ -60,7 +65,7 @@ app.post('/register',async (req,res)=>{
 
 })
 
-app.post('/login',async (req,res)=>{
+app.post('/api/login',async (req,res)=>{
 try{
     const {username,password} = req.body;
 
@@ -69,6 +74,9 @@ try{
     const [id] = await pool.execute<RowDataPacket[]>("SELECT id FROM users WHERE username = ?",[username]);
 
     console.log(1);
+
+    if(!search[0] || !id[0])return res.json({success:false,message:"serach wrong"})
+    
     console.log(search[0].password);
 
     const pwverify = await bcrypt.compare(password,search[0].password);
@@ -82,6 +90,7 @@ try{
         })
         );
     }
+
     const jwttrue = jwt.sign({id:id[0].id,user:username},select,{expiresIn:'1h'});
 
     return res.status(200).json({
@@ -98,7 +107,7 @@ try{
 }
 })
 
-app.post("/Submit",jwt1,async (req,res)=>{
+app.post("/api/Submit",jwt1,async (req,res)=>{
     try{
     const{statusID,statusMount,userID} = req.body;
 
@@ -110,7 +119,7 @@ app.post("/Submit",jwt1,async (req,res)=>{
     }
 })
 
-app.get("/Inquiry",jwt1,async (req,res)=>{
+app.get("/api/Inquiry",jwt1,async (req,res)=>{
     try{
         console.log('请求数据库连接.......');
         console.log('连接成功，正在调取数据.....');
@@ -129,7 +138,7 @@ app.get("/Inquiry",jwt1,async (req,res)=>{
     }
 })
 
-app.post("/admin/:status",jwt1,async (req,res)=>{
+app.post("/api/admin/:status",jwt1,async (req,res)=>{
     try{
         const {status} = req.params;
         const {id} = req.body;
@@ -158,7 +167,7 @@ app.post("/admin/:status",jwt1,async (req,res)=>{
     }
 })
 
-app.get("/got",jwt1,async (req,res)=>{
+app.get("/api/got",jwt1,async (req,res)=>{
     try{
         console.log("start access")
         const {userid} = req.query;
@@ -177,7 +186,6 @@ app.get("/got",jwt1,async (req,res)=>{
 })
 
 
-app.listen(3000,()=>{
+app.listen(PORT,()=>{
     console.log("监听3000端口");
 })
-

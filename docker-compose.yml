@@ -1,0 +1,31 @@
+services:
+  backend:
+    env_file:
+      - ./node/pool/.env
+    image: conposeback:v1
+    build:
+      context: ./node
+      dockerfile: Dockerfile
+    expose:
+      - "3000"
+  
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: 1126
+      MYSQL_DATABASE: system
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/system.sql:/docker-entrypoint-initdb.d/system.sql:ro
+
+  front:
+    image: usertext:v2
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+
+volumes:
+  mysql_data:

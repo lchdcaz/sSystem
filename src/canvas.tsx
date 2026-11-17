@@ -1,4 +1,4 @@
-import {useRef,useEffect} from 'react'
+
 
 export function Canvas(canvas:HTMLCanvasElement){
         

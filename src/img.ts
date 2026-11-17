@@ -7,9 +7,7 @@ import image6 from './assets/i6.png';
 import image7 from './assets/i7.png';
 import image8 from './assets/i8.png';
 
-let img = {}
-
-export default img = [
+let img = [
     "",
     image1,
     image2,
@@ -20,3 +18,4 @@ export default img = [
     image7,
     image8
 ]
+export default img ;

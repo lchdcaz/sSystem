@@ -1,6 +1,6 @@
 import './login.css';
 import api from './api.ts';
-import {useReducer,useState,useContext} from 'react';
+import {useReducer,useContext} from 'react';
 import {Reducer} from './reducer.tsx';
 import {useNavigate} from 'react-router-dom'
 import {Context} from './context.tsx'
@@ -10,7 +10,7 @@ export default function Login(){
     const [state,dispatch] = useReducer(Reducer,{"username":"","password":""});
     const {setUser,setId} = useContext(Context);
     async function register(){
-        const response = await api.post("/register",state);
+        const response = await api.post("/api/register",state);
 
         console.log(response);
     }

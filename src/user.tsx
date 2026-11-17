@@ -1,5 +1,5 @@
 import {Context} from './context.tsx';
-import {useContext,useEffect,useRef,useState,useReducer} from 'react';
+import {useContext,useEffect,useRef,useReducer} from 'react';
 import{useNavigate} from 'react-router-dom';
 import img from './img.ts';
 import './user.css';
@@ -134,7 +134,7 @@ export default function User(){
                  <div className = "w-[1px] h-[100%] shadow-[0_0_10px_3px_black,0_0_10px_6px_rgba(0,0,0,0.3),0_0_10px_7px_white] mr-10 border-1 border-white max-md:hidden"></div>
                  <div className = "min-md:hidden w-[100vw] h-[30px] bg-gray-800/60 flex items-center justify-center active:bg-white transition-all duration-300 ease-in-out perspective-[800px] group" onClick = {()=>{dispatch({type:"nav",value:(status.nav)});dispatch({type:"context",value:1});}}><button className = {`transition-all duration-300 ease-in-out text-xl ${status.nav ? "rotate-[90deg]" : "rotate-[-90deg]"}`}>{">"}</button></div>
                  <div className = {` flex content-start gap-5 flex-wrap max-h-[500px] justify-center history overflow-y-auto mr-10 pt-3 rounded-2xl shadow-[0_10px_10px_-5px_black] transition-all duration-400 min-md:group-data-[value=2]:hidden max-md:mr-0 ${status.context == 1 ? "w-[100%] max-md:h-[500px] justify-start pl-3" : "w-[55%] max-md:w-[100%] max-md:h-[300px]"}`}>
-                 {status.apply.map(({status,device:mount,user_id,requestid:deviceId,id},index)=>(
+                 {status.apply.map(({status,device:mount,user_id,requestid:deviceId},index)=>(
                     <div key = {index} className ={`bg-gray-500 w-[13vw] h-[20vh] min-w-[126px] min-h-[100px] max-md:h-[15vh] p-5 rounded-2xl text-white ${(status == 0) ? "inset-shadow-[0_0_15px_2px_var(--color-yellow-700)]" : (status == 1)? "inset-shadow-[0_0_10px_2px_var(--color-green-700)]" : "inset-shadow-[0_0_10px_2px_var(--color-red-900)]"}`}>
                         <h1>设备id:{deviceId}</h1>
                         <p>数量:{mount}</p>
